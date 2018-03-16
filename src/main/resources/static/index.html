@@ -35,9 +35,9 @@
       align-items: center;
     }
     #button {
+      cursor: pointer;
       height: 70%;
       width: 70%;
-      cursor: pointer;
     }
     .down {
       display: flex;
@@ -58,12 +58,59 @@
       color: white;
       text-align: center;
     }
+    .gone {
+      display: none;
+    }
+    #spinner {
+      margin: auto;
+      text-align: center;
+    }
+
+    #spinner > div {
+      width: 25px;
+      height: 25px;
+      background-color: white;
+      border-radius: 100%;
+      display: inline-block;
+      -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+    }
+
+    #spinner .bounce1 {
+      -webkit-animation-delay: -0.32s;
+      animation-delay: -0.32s;
+    }
+
+    #spinner .bounce2 {
+      -webkit-animation-delay: -0.16s;
+      animation-delay: -0.16s;
+    }
+
+    @-webkit-keyframes sk-bouncedelay {
+      0%, 80%, 100% { -webkit-transform: scale(0) }
+      40% { -webkit-transform: scale(1.0) }
+    }
+
+    @keyframes sk-bouncedelay {
+      0%, 80%, 100% { 
+        -webkit-transform: scale(0);
+        transform: scale(0);
+      } 40% { 
+        -webkit-transform: scale(1.0);
+        transform: scale(1.0);
+      }
+    }
   </style>
 </head>
 <body>
   <div id="status"><span>正在播放</span></div>
   <div class="up">
       <img id="button" src="./start.svg" />
+      <div id="spinner" class="gone">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
   </div>
   <div class="down">
     <input type="text" id="time">
@@ -94,6 +141,7 @@
     const minuteEle = document.getElementById('minute');
     const timeEle = document.getElementById('time');
     const buttonEle = document.getElementById('button');
+    const spinnerEle = document.getElementById('spinner');
     const refresh = async () => {
       playerStatus = (await get('/status')).data;
       if (playerStatus.playing) {
@@ -110,9 +158,19 @@
         buttonEle.src = './start.svg'
       }
     };
+    const setLoading = isLoading => {
+      if (isLoading) {
+        buttonEle.classList.add('gone');
+        spinnerEle.classList.remove('gone');
+      } else {
+        spinnerEle.classList.add('gone');
+        buttonEle.classList.remove('gone');
+      }
+    };
     refresh();
     setInterval(refresh, 5000);
     buttonEle.onclick = async () => {
+      setLoading(true);
       if (playerStatus.playing) {
         await post('/stop');
       } else {
@@ -120,6 +178,7 @@
         await post('/start', {maxtime});
       }
       await refresh();
+      setLoading(false);
     };
   </script>
 </body>

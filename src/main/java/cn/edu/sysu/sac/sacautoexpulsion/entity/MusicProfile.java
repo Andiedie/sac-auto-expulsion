@@ -22,6 +22,7 @@ public class MusicProfile {
     public void setMaxtime(int maxtime) {
         this.maxtime = maxtime;
     }
+
     @Autowired
     public MusicProfile() {
         maxtime = defaultMaxTime;

@@ -1,27 +1,27 @@
 package cn.edu.sysu.sac.sacautoexpulsion.controller;
 
-import cn.edu.sysu.sac.sacautoexpulsion.entity.BadRequest;
 import cn.edu.sysu.sac.sacautoexpulsion.entity.MusicProfile;
 import cn.edu.sysu.sac.sacautoexpulsion.entity.PlayerStatus;
 import cn.edu.sysu.sac.sacautoexpulsion.entity.Response;
-import cn.edu.sysu.sac.sacautoexpulsion.service.Service;
+import cn.edu.sysu.sac.sacautoexpulsion.service.MusicService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class Controller {
-    private Service service;
+    private MusicService service;
 
     @Autowired
-    public Controller(Service service) {
+    public Controller(MusicService service) {
         this.service = service;
     }
 
     @PostMapping("/start")
-    public Response start(@RequestBody @Nullable MusicProfile profile) throws BadRequest {
+    public Response start(@RequestBody @Nullable MusicProfile profile) {
         if (profile == null) profile = new MusicProfile();
         service.start(profile);
         return new Response();

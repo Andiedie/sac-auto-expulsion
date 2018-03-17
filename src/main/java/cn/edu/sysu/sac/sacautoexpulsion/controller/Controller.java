@@ -1,15 +1,13 @@
 package cn.edu.sysu.sac.sacautoexpulsion.controller;
 
+import cn.edu.sysu.sac.sacautoexpulsion.entity.BadRequest;
 import cn.edu.sysu.sac.sacautoexpulsion.entity.MusicProfile;
 import cn.edu.sysu.sac.sacautoexpulsion.entity.PlayerStatus;
 import cn.edu.sysu.sac.sacautoexpulsion.entity.Response;
 import cn.edu.sysu.sac.sacautoexpulsion.service.MusicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class Controller {
@@ -36,5 +34,28 @@ public class Controller {
     @GetMapping("/status")
     public Response<PlayerStatus> status() {
         return new Response<>("", service.status());
+    }
+
+    @PostMapping("/test")
+    public Response test() throws BadRequest {
+        service.test();
+        return new Response();
+    }
+
+    // These fucking functions are for gay gray
+    // http://expulsion.work.sac/gayPut
+    @PostMapping("/gayPut")
+    @CrossOrigin
+    public Response putData(@RequestBody @Nullable String data) throws BadRequest {
+        if (data == null) data = "";
+        service.putData(data);
+        return new Response();
+    }
+
+    @GetMapping("/gayGet")
+    @CrossOrigin
+    public Response<String> getData() throws BadRequest {
+        String data = service.getData();
+        return new Response<>("", data);
     }
 }

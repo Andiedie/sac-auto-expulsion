@@ -48,13 +48,13 @@
     }
     #minute {
       color: #4583f4;
-      font-size: 50px;
+      font-size: 40px;
     }
     #time {
       border: 0;
       background-color: #4583f4;
-      font-size: 50px;
-      width: auto;
+      font-size: 40px;
+      width: 6em;
       color: white;
       text-align: center;
     }
@@ -100,10 +100,24 @@
         transform: scale(1.0);
       }
     }
+    #test {
+      color: white;
+      position: fixed;
+      bottom: 2px;
+      right: 2px;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 2px;
+      user-select: none;
+    }
+    #test:hover {
+      border: 2px solid #4583f4;
+      color: #4583f4;
+    }
   </style>
 </head>
 <body>
-  <div class="status-wrapper"><span id="status">正在播放</span></div>
+  <div class="status-wrapper"><span id="status">状态获取中</span></div>
   <div class="up">
       <img id="button" src="./start.svg" />
       <div id="spinner" class="gone">
@@ -113,9 +127,10 @@
       </div>
   </div>
   <div class="down">
-    <input type="text" id="time">
-    <span id="minute">分钟</span>
+    <input type="text" value="30" id="time">
+    <span id="minute">分钟自动停止</span>
   </div>
+  <div id="test">Test</div>
   <script>
     const baseUrl = '';
     const _http = async (method, url, data) => {
@@ -125,7 +140,7 @@
           headers: {'content-type': 'application/json'}
       });
       if (response.ok) return response.json();
-      else throw response.json();
+      else throw await response.json();
     };
     const post = async (url, data) => _http('POST', url, data);
     const get = async (url) => _http('GET', url);
@@ -142,19 +157,20 @@
     const timeEle = document.getElementById('time');
     const buttonEle = document.getElementById('button');
     const spinnerEle = document.getElementById('spinner');
+    const testEle = document.getElementById('test');
     const refresh = async () => {
       playerStatus = (await get('/status')).data;
       if (playerStatus.playing) {
         statusEle.textContent = '正在播放';
-        minuteEle.textContent = '结束';
+        minuteEle.textContent = '结束播放';
         const endTime = new Date(playerStatus.startTime);
         endTime.setMilliseconds(endTime.getMilliseconds() + playerStatus.maxtime);
         timeEle.value = formatDate(endTime);
         buttonEle.src = './stop.svg'
       } else {
         statusEle.textContent = '未播放';
-        minuteEle.textContent = '分钟';
-        timeEle.value = '';
+        minuteEle.textContent = '分钟自动停止';
+        timeEle.value = '30';
         buttonEle.src = './start.svg'
       }
     };
@@ -179,6 +195,15 @@
       }
       await refresh();
       setLoading(false);
+    };
+    testEle.onclick = async () => {
+      if (confirm('将播放测试音频，确认进行测试？')) {
+        try {
+          await post('/test');
+        } catch (e) {
+          alert(e.errmsg);
+        }
+      }
     };
   </script>
 </body>
